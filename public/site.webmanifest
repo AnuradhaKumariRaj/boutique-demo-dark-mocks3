@@ -1,0 +1,16 @@
+{
+  "name": "Fashion Bootique Noir",
+  "short_name": "Bootique Noir",
+  "description": "Premium dark boutique demo with bold luxury styling, WhatsApp ordering, and Pan India shipping.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#111111",
+  "theme_color": "#111111",
+  "icons": [
+    {
+      "src": "/favicon.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    }
+  ]
+}
