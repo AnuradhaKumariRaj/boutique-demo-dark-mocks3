@@ -12,13 +12,34 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 import os
 from pathlib import Path
+from urllib.parse import urlparse
 
 import dj_database_url
 from django.core.exceptions import ImproperlyConfigured
 
+
+def load_env_file(env_path):
+    if not env_path.exists():
+        return
+
+    for raw_line in env_path.read_text().splitlines():
+        line = raw_line.strip()
+
+        if not line or line.startswith('#') or '=' not in line:
+            continue
+
+        key, value = line.split('=', 1)
+        key = key.strip()
+        value = value.strip().strip('"').strip("'")
+
+        if key:
+            os.environ[key] = value
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 FRONTEND_DIR = BASE_DIR.parent
+load_env_file(BASE_DIR / '.env')
 
 
 # Quick-start development settings - unsuitable for production
@@ -91,6 +112,41 @@ DATABASE_URL = os.environ.get('DATABASE_URL')
 
 if not DATABASE_URL:
     raise ImproperlyConfigured('DATABASE_URL must be set to a PostgreSQL database URL.')
+
+database_url_parts = urlparse(DATABASE_URL)
+
+if database_url_parts.scheme not in {'postgres', 'postgresql'}:
+    raise ImproperlyConfigured('DATABASE_URL must start with postgres:// or postgresql://.')
+
+placeholder_values = {
+    'user',
+    'pass',
+    'your_db_user',
+    'your_db_password',
+    'your_db_host',
+    'your_db_name',
+    'your_postgres_password',
+}
+
+if any(
+    value in placeholder_values
+    for value in (
+        database_url_parts.username,
+        database_url_parts.password,
+        database_url_parts.hostname,
+        database_url_parts.path.lstrip('/'),
+    )
+):
+    raise ImproperlyConfigured(
+        'DATABASE_URL is still using placeholder values. '
+        'Replace it with your real Render Postgres database URL.'
+    )
+
+if os.environ.get('RENDER') and database_url_parts.hostname in {'localhost', '127.0.0.1'}:
+    raise ImproperlyConfigured(
+        'DATABASE_URL points to localhost on Render. '
+        'Use the Render Postgres Internal Database URL instead.'
+    )
 
 DATABASES = {
     'default': dj_database_url.parse(

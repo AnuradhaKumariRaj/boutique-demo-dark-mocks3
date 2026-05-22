@@ -20,6 +20,18 @@ source .venv/bin/activate
 python manage.py runserver
 ```
 
+Before running the backend, update `.env` with your real Postgres details:
+
+```bash
+DATABASE_URL=postgresql://db_user:db_password@db_host:5432/db_name
+SECRET_KEY=<a new long random secret>
+DEBUG=True
+ALLOWED_HOSTS=*
+CSRF_TRUSTED_ORIGINS=
+```
+
+Keep `.env` private because it contains credentials.
+
 Open:
 
 - Admin: `http://127.0.0.1:8000/admin/`

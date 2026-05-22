@@ -3,6 +3,21 @@ import { useEffect, useRef } from 'react'
 export function ServicesSection({ collections, onProductSelect }) {
   const sliderRefs = useRef({})
 
+  const getUniqueProducts = (products) => {
+    const seenProducts = new Set()
+
+    return products.filter((product) => {
+      const productKey = product.image || product.name
+
+      if (seenProducts.has(productKey)) {
+        return false
+      }
+
+      seenProducts.add(productKey)
+      return true
+    })
+  }
+
   const scrollCollection = (heading, direction) => {
     const slider = sliderRefs.current[heading]
 
@@ -10,7 +25,11 @@ export function ServicesSection({ collections, onProductSelect }) {
       return
     }
 
-    const scrollAmount = slider.clientWidth * 0.85
+    const firstCard = slider.querySelector('.product-card')
+    const scrollAmount = firstCard
+      ? firstCard.getBoundingClientRect().width + 20
+      : slider.clientWidth * 0.35
+
     slider.scrollBy({
       left: direction === 'next' ? scrollAmount : -scrollAmount,
       behavior: 'smooth',
@@ -26,7 +45,10 @@ export function ServicesSection({ collections, onProductSelect }) {
           return
         }
 
-        const scrollAmount = slider.clientWidth * 0.85
+        const firstCard = slider.querySelector('.product-card')
+        const scrollAmount = firstCard
+          ? firstCard.getBoundingClientRect().width + 20
+          : slider.clientWidth * 0.35
         const maxScrollLeft = slider.scrollWidth - slider.clientWidth
         const currentScrollLeft = slider.scrollLeft
         const nextScrollLeft = currentScrollLeft + scrollAmount
@@ -40,7 +62,7 @@ export function ServicesSection({ collections, onProductSelect }) {
           behavior: 'smooth',
         })
       })
-    }, 4000)
+    }, 1100)
 
     return () => window.clearInterval(intervalId)
   }, [collections])
@@ -54,7 +76,11 @@ export function ServicesSection({ collections, onProductSelect }) {
         </div>
       </div>
 
-      {collections.map((collection) => (
+      {collections.map((collection) => {
+        const uniqueProducts = getUniqueProducts(collection.products)
+        const isCompactCarousel = collection.heading.toLowerCase().includes('mom') || uniqueProducts.length <= 4
+
+        return (
         <div className="product-collection" key={collection.heading}>
           <div className="product-collection-bar">
             <h3 className="product-collection-heading">{collection.heading}</h3>
@@ -78,13 +104,13 @@ export function ServicesSection({ collections, onProductSelect }) {
             </div>
           </div>
           <div
-            className="product-slider"
+            className={`product-slider ${isCompactCarousel ? 'is-compact-carousel' : ''}`}
             ref={(node) => {
               sliderRefs.current[collection.heading] = node
             }}
           >
-            {collection.products.map((service) => (
-              <article className="product-card" key={service.name}>
+            {uniqueProducts.map((service) => (
+              <article className="product-card" key={service.id ?? service.name}>
                 <button
                   className="product-image-button"
                   type="button"
@@ -106,7 +132,8 @@ export function ServicesSection({ collections, onProductSelect }) {
             ))}
           </div>
         </div>
-      ))}
+        )
+      })}
     </section>
   )
 }

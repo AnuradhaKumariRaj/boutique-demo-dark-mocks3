@@ -1186,6 +1186,7 @@
 .back-link-button,
 .brand-wordmark,
 .product-card-body h3,
+.product-collection-heading,
 .trust-card h3,
 .spotlight-card h3,
 .footer-brand h2,
@@ -1279,4 +1280,76 @@
 
 .footer-bottom p {
   border-top-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Product image layout: match the blue demo's single-row arrivals while keeping uploads tidy. */
+.product-slider {
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(220px, calc((100% - 60px) / 4));
+  grid-template-columns: none;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+}
+
+.product-slider.is-compact-carousel {
+  grid-auto-columns: minmax(260px, 52%);
+}
+
+.all-products-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.product-slider-controls {
+  display: flex;
+}
+
+.product-slider .product-card {
+  scroll-snap-align: start;
+}
+
+.product-image-wrap {
+  display: grid;
+  position: relative;
+  height: 360px;
+  place-items: center;
+  background: #111;
+}
+
+.product-image-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+}
+
+@media (max-width: 1100px) {
+  .product-slider {
+    grid-auto-columns: minmax(240px, 48%);
+  }
+
+  .product-slider.is-compact-carousel {
+    grid-auto-columns: minmax(240px, 64%);
+  }
+
+  .all-products-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .product-slider {
+    grid-auto-columns: 85%;
+  }
+
+  .product-slider.is-compact-carousel {
+    grid-auto-columns: 85%;
+  }
+
+  .all-products-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .product-image-wrap {
+    height: 340px;
+  }
 }
